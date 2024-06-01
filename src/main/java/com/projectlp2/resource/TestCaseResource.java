@@ -21,29 +21,31 @@ import com.projectlp2.repository.TestCaseRepository;
 public class TestCaseResource {
 
     @Inject
-    TestCaseRepository repository;
+    ProblemRepository problemRepository;
 
     @Inject
-    ProblemRepository problemRepository;
+    TestCaseRepository testCaseRepository;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response registerTestCase(@Valid TestCaseDTO testCaseDTO) {
+        // Verificar se o problema existe
         Problem problem = problemRepository.find("problemCode", testCaseDTO.getProblemCode()).firstResult();
         if (problem == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new ErrorResponse("ERR002", "Problem not found")
+                    new ErrorResponse("ERR003", "Problem code does not exist")
             ).build();
         }
 
+        // Criar e persistir a entidade TestCase
         TestCase testCase = new TestCase();
-        testCase.setProblemId(problem.getId());
         testCase.setInputFile(testCaseDTO.getInputFile());
         testCase.setExpectedOutputFile(testCaseDTO.getExpectedOutputFile());
+        testCase.setProblem(problem); // Associando o problema ao caso de teste
 
-        repository.persist(testCase);
+        testCaseRepository.persist(testCase);
         return Response.status(Response.Status.CREATED).entity(testCaseDTO).build();
     }
 }

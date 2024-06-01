@@ -26,12 +26,21 @@ public class ProblemResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response registerProblem(@Valid ProblemDTO problemDTO) {
+        // Verificar se já existe um problema com o mesmo código
         if (repository.find("problemCode", problemDTO.getProblemCode()).firstResultOptional().isPresent()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
                     new ErrorResponse("ERR001", "Problem code already exists")
             ).build();
         }
 
+        // Verificar se já existe um problema com o mesmo filename
+        if (repository.find("filename", problemDTO.getFilename()).firstResultOptional().isPresent()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    new ErrorResponse("ERR002", "Filename already exists")
+            ).build();
+        }
+
+        // Criar e persistir a entidade Problem
         Problem problem = new Problem();
         problem.setFilename(problemDTO.getFilename());
         problem.setProblemCode(problemDTO.getProblemCode());

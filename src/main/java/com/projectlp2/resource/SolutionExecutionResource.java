@@ -56,7 +56,7 @@ public class SolutionExecutionResource {
             ).build();
         }
 
-        List<TestCase> testCases = testCaseRepository.find("problemId", problem.getId()).list();
+        List<TestCase> testCases = testCaseRepository.find("problem_id", problem.getId()).list();
         boolean allTestsPassed = true;
 
         for (TestCase testCase : testCases) {

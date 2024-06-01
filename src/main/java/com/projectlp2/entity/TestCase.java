@@ -1,18 +1,24 @@
 package com.projectlp2.entity;
 
+import javax.persistence.*;
+
 import lombok.Data;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @Entity
 @Data
 public class TestCase {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long problemId;
+
+    @Column(nullable = false)
     private String inputFile;
+
+    @Column(nullable = false)
     private String expectedOutputFile;
+
+    @ManyToOne
+    @JoinColumn(name = "problem_id")
+    private Problem problem;
 }
