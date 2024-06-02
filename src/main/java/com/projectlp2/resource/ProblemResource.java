@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -14,6 +15,9 @@ import com.projectlp2.dto.ProblemDTO;
 import com.projectlp2.dto.ErrorResponse;
 import com.projectlp2.entity.Problem;
 import com.projectlp2.repository.ProblemRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/activity")
 public class ProblemResource {
@@ -48,5 +52,19 @@ public class ProblemResource {
 
         repository.persist(problem);
         return Response.status(Response.Status.CREATED).entity(problemDTO).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllProblems() {
+        List<Problem> problems = repository.listAll();
+        List<ProblemDTO> problemDTOs = problems.stream().map(problem -> {
+            ProblemDTO dto = new ProblemDTO();
+            dto.setFilename(problem.getFilename());
+            dto.setProblemCode(problem.getProblemCode());
+            dto.setLps(problem.getLps());
+            return dto;
+        }).collect(Collectors.toList());
+        return Response.ok(problemDTOs).build();
     }
 }

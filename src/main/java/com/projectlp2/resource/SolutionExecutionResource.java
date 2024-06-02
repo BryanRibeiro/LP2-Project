@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -22,6 +23,7 @@ import com.projectlp2.repository.TestCaseRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 
 @Path("/activity/solution")
@@ -80,5 +82,21 @@ public class SolutionExecutionResource {
         responseDTO.setCreatedAt(submission.getCreatedAt());
 
         return Response.status(Response.Status.CREATED).entity(responseDTO).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllSolutionExecutions() {
+        List<SolutionExecution> executions = executionRepository.listAll();
+        List<SolutionResponseDTO> executionDTOs = executions.stream().map(execution -> {
+            SolutionResponseDTO dto = new SolutionResponseDTO();
+            dto.setAuthor(execution.getAuthor());
+            dto.setFilename(execution.getFilename());
+            dto.setProblemCode(execution.getProblemCode());
+            dto.setStatus(execution.getStatus());
+            dto.setCreatedAt(execution.getCreatedAt());
+            return dto;
+        }).collect(Collectors.toList());
+        return Response.ok(executionDTOs).build();
     }
 }

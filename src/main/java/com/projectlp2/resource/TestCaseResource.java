@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -16,6 +17,9 @@ import com.projectlp2.entity.Problem;
 import com.projectlp2.entity.TestCase;
 import com.projectlp2.repository.ProblemRepository;
 import com.projectlp2.repository.TestCaseRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Path("/tc")
 public class TestCaseResource {
@@ -47,5 +51,19 @@ public class TestCaseResource {
 
         testCaseRepository.persist(testCase);
         return Response.status(Response.Status.CREATED).entity(testCaseDTO).build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllTestCases() {
+        List<TestCase> testCases = testCaseRepository.listAll();
+        List<TestCaseDTO> testCaseDTOs = testCases.stream().map(testCase -> {
+            TestCaseDTO dto = new TestCaseDTO();
+            dto.setProblemCode(testCase.getProblem().getProblemCode());
+            dto.setInputFile(testCase.getInputFile());
+            dto.setExpectedOutputFile(testCase.getExpectedOutputFile());
+            return dto;
+        }).collect(Collectors.toList());
+        return Response.ok(testCaseDTOs).build();
     }
 }
