@@ -95,7 +95,7 @@ public class SolutionExecutionResource {
         }
 
         List<TestCase> testCases = testCaseRepository.find("problem.id", problem.getId()).list();
-        boolean allTestsPassed = true;
+        boolean anyTestPassed = false;
 
         // Diretório para salvar o código fonte e os arquivos de entrada e saída
         String directory = "temp";
@@ -116,8 +116,8 @@ public class SolutionExecutionResource {
 
         for (TestCase testCase : testCases) {
             boolean testPassed = runTestCase(sourceCodePath, testCase);
-            if (!testPassed) {
-                allTestsPassed = false;
+            if (testPassed) {
+                anyTestPassed = true;
                 break;
             }
         }
@@ -127,7 +127,7 @@ public class SolutionExecutionResource {
         submission.setFilename(filename);
         submission.setProblemCode(problemCode);
         submission.setSourceCode(tempFile.getAbsolutePath()); // Armazenar o caminho absoluto do arquivo temporário
-        submission.setStatus(allTestsPassed ? "SUCCESS" : "FAIL");
+        submission.setStatus(anyTestPassed ? "SUCCESS" : "FAIL");
         submission.setCreatedAt(LocalDateTime.now());
         executionRepository.persist(submission);
 
