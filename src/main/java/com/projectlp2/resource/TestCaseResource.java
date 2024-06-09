@@ -3,14 +3,16 @@ package com.projectlp2.resource;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
+import com.projectlp2.repository.TestCaseRepository;
 import com.projectlp2.dto.TestCaseDTO;
 import com.projectlp2.dto.ErrorResponse;
 import com.projectlp2.entity.Problem;
@@ -51,6 +53,16 @@ public class TestCaseResource {
             return dto;
         }).collect(Collectors.toList());
         return Response.ok(testCaseDTOs).build();
+    }
+
+    @GET
+    @Path("/{problemCode}")
+    public Response getTestCasesByProblemCode(@PathParam("problemCode") String problemCode) {
+        List<TestCase> testCases = testCaseRepository.find("problem_id", problemCode).list();
+        if (testCases.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(testCases).build();
     }
 
     @POST
@@ -109,5 +121,15 @@ public class TestCaseResource {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @DELETE
+    @Path("/{testCaseId}")
+    @Transactional
+    public Response removeTestCase(@PathParam("testCaseId") Long testCaseId) {
+        // Excluir o caso de teste com base no ID fornecido
+        testCaseRepository.deleteByTestCaseId(testCaseId);
+
+        return Response.ok().build();
     }
 }

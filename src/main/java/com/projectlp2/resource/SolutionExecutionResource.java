@@ -14,13 +14,14 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
@@ -50,6 +51,9 @@ public class SolutionExecutionResource {
 
     @Inject
     TestCaseRepository testCaseRepository;
+
+    @Inject
+    SolutionExecutionRepository solutionExecutionRepository;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -187,5 +191,19 @@ public class SolutionExecutionResource {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @DELETE
+    @Path("/{solutionId}")
+    @Transactional
+    public Response removeSolution(@PathParam("solutionId") Long solutionId) {
+        SolutionExecution solution = solutionExecutionRepository.findById(solutionId);
+
+        if (solution == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        solutionExecutionRepository.delete(solution);
+        return Response.ok().build();
     }
 }

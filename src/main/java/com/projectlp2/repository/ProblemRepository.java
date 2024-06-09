@@ -6,4 +6,8 @@ import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class ProblemRepository implements PanacheRepository<Problem> {
+
+    public void deleteByProblemCode(String problemCode) {
+        delete("problemCode", problemCode);
+    }
 }

@@ -6,4 +6,8 @@ import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class SolutionExecutionRepository implements PanacheRepository<SolutionExecution> {
+
+    public void deleteBySolutionId(Long solutionId) {
+        delete("id", solutionId);
+    }
 }
