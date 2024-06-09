@@ -51,56 +51,6 @@ public class SolutionExecutionResource {
     @Inject
     TestCaseRepository testCaseRepository;
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    public Response submitSolution(@Valid SolutionSubmissionDTO submissionDTO) {
-        Optional<Problem> problemOptional = problemRepository.find("problemCode", submissionDTO.getProblemCode()).firstResultOptional();
-        if (!problemOptional.isPresent()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new ErrorResponse("ERR003", "Problem not found")
-            ).build();
-        }
-
-        Problem problem = problemOptional.get();
-
-        if (!submissionDTO.getFilename().equals(problem.getFilename() + ".py")) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new ErrorResponse("ERR004", "Filename does not match registered problem filename")
-            ).build();
-        }
-
-        List<TestCase> testCases = testCaseRepository.find("problem_id", problem.getId()).list();
-        boolean allTestsPassed = true;
-
-        // Verificar se a solução passa em todos os casos de teste
-        for (TestCase testCase : testCases) {
-            if (!runTestCase(submissionDTO, testCase)) {
-                allTestsPassed = false;
-                break;
-            }
-        }
-
-        SolutionExecution submission = new SolutionExecution();
-        submission.setAuthor(submissionDTO.getAuthor());
-        submission.setFilename(submissionDTO.getFilename());
-        submission.setProblemCode(submissionDTO.getProblemCode());
-        submission.setSourceCode(submissionDTO.getSourceCode());
-        submission.setStatus(allTestsPassed ? "SUCCESS" : "FAIL");
-        submission.setCreatedAt(LocalDateTime.now());
-        executionRepository.persist(submission);
-
-        SolutionResponseDTO responseDTO = new SolutionResponseDTO();
-        responseDTO.setAuthor(submission.getAuthor());
-        responseDTO.setFilename(submission.getFilename());
-        responseDTO.setProblemCode(submission.getProblemCode());
-        responseDTO.setStatus(submission.getStatus());
-        responseDTO.setCreatedAt(submission.getCreatedAt());
-
-        return Response.status(Response.Status.CREATED).entity(responseDTO).build();
-    }
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllSolutionExecutions() {
@@ -118,7 +68,6 @@ public class SolutionExecutionResource {
     }
 
     @POST
-    @Path("/upload")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
@@ -148,8 +97,25 @@ public class SolutionExecutionResource {
         List<TestCase> testCases = testCaseRepository.find("problem.id", problem.getId()).list();
         boolean allTestsPassed = true;
 
+        // Diretório para salvar o código fonte e os arquivos de entrada e saída
+        String directory = "temp";
+        File tempDir = new File(directory);
+        tempDir.mkdir();
+
+        // Salvar o código fonte do usuário em um arquivo temporário
+        String sourceCodePath = directory + "/" + filename;
+        File tempFile = new File(sourceCodePath);
+        try {
+            Files.write(tempFile.toPath(), sourceCode.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
+                    new ErrorResponse("ERR005", "Failed to write source code to file")
+            ).build();
+        }
+
         for (TestCase testCase : testCases) {
-            boolean testPassed = runTestCase(author, problemCode, filename, sourceCode, testCase);
+            boolean testPassed = runTestCase(sourceCodePath, testCase);
             if (!testPassed) {
                 allTestsPassed = false;
                 break;
@@ -160,7 +126,7 @@ public class SolutionExecutionResource {
         submission.setAuthor(author);
         submission.setFilename(filename);
         submission.setProblemCode(problemCode);
-        submission.setSourceCode(sourceCode);
+        submission.setSourceCode(tempFile.getAbsolutePath()); // Armazenar o caminho absoluto do arquivo temporário
         submission.setStatus(allTestsPassed ? "SUCCESS" : "FAIL");
         submission.setCreatedAt(LocalDateTime.now());
         executionRepository.persist(submission);
@@ -188,28 +154,13 @@ public class SolutionExecutionResource {
     }
 
     // Método para executar um caso de teste e comparar a saída com a saída esperada
-    private boolean runTestCase(SolutionSubmissionDTO submissionDTO, TestCase testCase) {
-        return runTestCase(submissionDTO.getAuthor(), submissionDTO.getProblemCode(), submissionDTO.getFilename(), submissionDTO.getSourceCode(), testCase);
-    }
-
-    private boolean runTestCase(String author, String problemCode, String filename, String sourceCode, TestCase testCase) {
+    private boolean runTestCase(String sourceCodePath, TestCase testCase) {
         // Diretório para salvar o código fonte e os arquivos de entrada e saída
         String directory = "temp";
-        File tempDir = new File(directory);
-        tempDir.mkdir();
-
-        // Salvar o código fonte do usuário em um arquivo temporário
-        String sourceCodePath = directory + "/" + filename;
-        try {
-            Files.write(Paths.get(sourceCodePath), sourceCode.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
 
         // Ler o conteúdo do arquivo de entrada registrado
-        String inputFilePath = directory + "/" + testCase.getInputFile();
-        String expectedOutputFilePath = directory + "/" + testCase.getExpectedOutputFile();
+        String inputFilePath = testCase.getInputFile();
+        String expectedOutputFilePath = testCase.getExpectedOutputFile();
         String inputContent = null;
         String expectedOutputContent = null;
         try {

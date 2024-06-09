@@ -39,28 +39,6 @@ public class TestCaseResource {
     @Inject
     TestCaseRepository testCaseRepository;
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    public Response registerTestCase(@Valid TestCaseDTO testCaseDTO) {
-        // Verificar se o problema existe
-        Problem problem = problemRepository.find("problemCode", testCaseDTO.getProblemCode()).firstResult();
-        if (problem == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(
-                    new ErrorResponse("ERR003", "Problem code does not exist")
-            ).build();
-        }
-
-        // Criar e persistir a entidade TestCase
-        TestCase testCase = new TestCase();
-        testCase.setInputFile(testCaseDTO.getInputFile());
-        testCase.setExpectedOutputFile(testCaseDTO.getExpectedOutputFile());
-        testCase.setProblem(problem); // Associando o problema ao caso de teste
-
-        testCaseRepository.persist(testCase);
-        return Response.status(Response.Status.CREATED).entity(testCaseDTO).build();
-    }
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllTestCases() {
@@ -76,7 +54,6 @@ public class TestCaseResource {
     }
 
     @POST
-    @Path("/upload")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Transactional
@@ -84,8 +61,8 @@ public class TestCaseResource {
         Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
 
         String problemCode = extractFormField(uploadForm, "problemCode");
-        String inputFile = saveFile(uploadForm, "inputFile");
-        String expectedOutputFile = saveFile(uploadForm, "expectedOutputFile");
+        String inputFilePath = saveFile(uploadForm, "inputFile");
+        String expectedOutputFilePath = saveFile(uploadForm, "expectedOutputFile");
 
         Problem problem = problemRepository.find("problemCode", problemCode).firstResult();
         if (problem == null) {
@@ -95,8 +72,8 @@ public class TestCaseResource {
         }
 
         TestCase testCase = new TestCase();
-        testCase.setInputFile(inputFile);
-        testCase.setExpectedOutputFile(expectedOutputFile);
+        testCase.setInputFile(inputFilePath);
+        testCase.setExpectedOutputFile(expectedOutputFilePath);
         testCase.setProblem(problem);
 
         testCaseRepository.persist(testCase);
