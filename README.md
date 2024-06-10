@@ -70,7 +70,7 @@ Após iniciar o projeto, você poderá acessar os endpoints através do seguinte
 - `GET /activity/solution`: Retorna todas as soluções submetidas.
 
 Outras requisições especificas: 
-- `GET /activity/{problemCode}`: Retorna um problema específico da base de dados com base no problemCode fornecido.
+- `GET /activity/{problemCode}`: Retorna um problema específico do BD com base no problemCode fornecido.
 - `GET /tc/{problem_id}`: Retorna um test case específico cadastrado no sistema com base no ID fornecido.
 - `GET /activity/solution/{id}`: Retorna uma solução submetida específica do sistema com base no ID fornecido.
 
