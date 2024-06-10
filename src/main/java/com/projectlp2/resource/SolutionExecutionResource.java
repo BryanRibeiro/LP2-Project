@@ -71,6 +71,17 @@ public class SolutionExecutionResource {
         return Response.ok(executionDTOs).build();
     }
 
+    @GET
+    @Path("/{id}")
+    public Response getSolutionById(@PathParam("id") Long id) {
+        SolutionExecution solution = solutionExecutionRepository.findById(id);
+
+        if (solution == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(solution).build();
+    }
+
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
