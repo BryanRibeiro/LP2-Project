@@ -5,79 +5,60 @@ LP-System é um sistema para registro e execução de problemas de programação
 Antes de iniciar, certifique-se de ter instalado em sua máquina:
 - [Java Development Kit (JDK) 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 - [Apache Maven](https://maven.apache.org/download.cgi)
-- [MySQL](https://www.mysql.com/downloads/)
+- [Docker](https://docs.docker.com/desktop/install/windows-install/)
 
-## Configuração do Banco de Dados
-1. Crie um banco de dados MySQL chamado `lp_system`.
-2. No arquivo `src/main/resources/application.properties`, configure o acesso ao banco de dados conforme abaixo:
+# Configuração do Projeto
 
+1. Clone o repositório:
 ```bash
-quarkus.datasource.db-kind=mysql
-quarkus.datasource.username=seu_usuario_mysql
-quarkus.datasource.password=sua_senha_mysql
-quarkus.datasource.jdbc.url=jdbc:mysql://localhost:3306/lp_system
-quarkus.hibernate-orm.database.generation=update
+git clone https://github.com/BryanRibeiro/LP2-Project.git
 ```
 
-# Passos para rodar o projeto:
+2. Abra o projeto em sua IDE (Recomendo o IntelliJ IDEA).
+3. Configure o arquivo `src/main/resources/application.properties` com as credenciais do banco de dados MySQL conforme abaixo:
+```bash
+quarkus.datasource.db-kind=mysql
+quarkus.datasource.username=root
+quarkus.datasource.password=aluno
+quarkus.datasource.jdbc.url=jdbc:mysql://localhost:3307/problemlp2
+quarkus.hibernate-orm.database.generation=update
+```
+   
+4. Execute o comando Maven para construir o projeto:
+```bash
+mvn clean install
+```
 
-1. Clone o repositório do projeto: `git clone https://github.com/BryanRibeiro/LP2-Project.git`
-2. Abra o projeto em sua IDE favorita.
-3. Certifique-se de ter o MySQL instalado e em execução.
-4. Configure o arquivo `application.properties` com as credenciais do banco de dados MySQL.
-5. Execute o comando Maven para construir o projeto: `mvn clean install`.
-6. Inicie a aplicação Quarkus: `mvn quarkus:dev`.
-7. Acesse os endpoints da API conforme necessário.
+5. Inicie a aplicação Quarkus:
+```bash
+mvn quarkus:dev
+```
 
-## Endpoints Disponíveis
+# Configuração do Banco de Dados
+
+1. Certifique-se de ter o [Docker](https://docs.docker.com/desktop/install/windows-install/) instalado e em execução.
+2. No terminal, navegue até a pasta do projeto.
+3. Na raiz do projeto, execute o comando a seguir para criar as imagens do contêiner do MySQL:
+
+```bash
+docker-compose up --build
+```
+Isso criará um contêiner do MySQL com as configurações especificadas no arquivo docker-compose.yml.
+
+Esses comandos são usados para acessar o contêiner do MySQL e interagir com o banco de dados:
+4. Permite acessar o shell do contêiner MySQL.
+```bash
+docker exec -it mysql bash
+```
+5. Em seguida, o comando abaixo é usado para acessar o banco de dados problemlp2 com o usuário root e a senha aluno.
+```bash
+mysql -uroot -paluno problemlp2
+```
+
+# Endpoints Disponíveis
 - `POST /activity`: Registra um problema na base de dados.
 - `POST /tc`: Registra um teste case para o problema.
 - `POST /activity/solution`: Submete uma solução para um problema registrado.
-
-# Exemplos de Requisição com Postman:
-
-## Cadastrar um problema (json):
-**Método:** POST  
-**URL:** `http://localhost:8080/activity`  
-**Headers:**  
-- Content-Type: application/json  
-**Body:**
-```json
-{
-  "filename": "pradinho",
-  "problem": "A",
-  "lps": "python"
-}
-```
-
-## Cadastrar um caso de teste (json):
-**Método:** POST  
-**URL:** `http://localhost:8080/tc`  
-**Headers:**  
-- Content-Type: application/json  
-**Body:**
-```json
-{
-  "problemCode": "A",
-  "inputFile": "<arquivo_de_entrada>",
-  "expectedOutputFile": "<arquivo_resultado_esperado>"
-}
-```
-
-## Cadastrar uma solução (json):
-**Método:** POST  
-**URL:** `http://localhost:8080/activity/solution`  
-**Headers:**  
-- Content-Type: application/json  
-**Body:**
-```json
-{
-  "author": "autor_da_solucao",
-  "filename": "nome_do_arquivo.py",
-  "problemCode": "A",
-  "sourceCode": "código_fonte_da_solucao"
-}
-```
 
 
 
