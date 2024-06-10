@@ -46,6 +46,7 @@ docker-compose up --build
 Isso criará um contêiner do MySQL com as configurações especificadas no arquivo docker-compose.yml.
 
 Esses comandos são usados para acessar o contêiner do MySQL e interagir com o banco de dados:
+
 4. Permite acessar o shell do contêiner MySQL.
 ```bash
 docker exec -it mysql bash
