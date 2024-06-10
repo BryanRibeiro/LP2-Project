@@ -59,7 +59,7 @@ mysql -uroot -paluno problemlp2
 
 Após iniciar o projeto, você poderá acessar os endpoints através do seguinte link: http://localhost:8080/
 
-### Requisição POST
+### Requisição POST (Postman)
 - `POST /activity`: Registra um problema na base de dados.
 - `POST /tc`: Registra um teste case para o problema.
 - `POST /activity/solution`: Submete uma solução para um problema registrado.
@@ -69,10 +69,15 @@ Após iniciar o projeto, você poderá acessar os endpoints através do seguinte
 - `GET /tc`: Retorna todos os test cases cadastrados.
 - `GET /activity/solution`: Retorna todas as soluções submetidas.
 
-Outras requisições especificas: 
-- `GET /activity/{problemCode}`: Retorna um problema específico do BD com base no problemCode fornecido.
+Outras requisições GET especificas: 
+- `GET /activity/{problemCode}`: Retorna um problema específico do banco com base no problemCode fornecido.
 - `GET /tc/{problem_id}`: Retorna um test case específico cadastrado no sistema com base no ID fornecido.
 - `GET /activity/solution/{id}`: Retorna uma solução submetida específica do sistema com base no ID fornecido.
+
+### Requisição DELETE (Postman)
+- `DELETE /activity/{problemCode}`: Remove um problema específico do banco com base no problemCode fornecido.
+- `DELETE /tc/{testCaseId}`: Remove um test case específico cadastrado no sistema com base no ID fornecido.
+- `DELETE /activity/solution/{solutionId}`: Remove uma solução submetida específica do sistema com base no ID fornecido.
 
 
 
