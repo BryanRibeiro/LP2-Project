@@ -1,7 +1,7 @@
-# LP2 Project
+## Aluno: Bryan Romero Ribeiro
 LP-System é um sistema para registro e execução de problemas de programação, desenvolvido como parte de um projeto acadêmico.
 
-## Pré-requisitos
+# Pré-requisitos
 Antes de iniciar, certifique-se de ter instalado em sua máquina:
 - [Java Development Kit (JDK) 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 - [Apache Maven](https://maven.apache.org/download.cgi)
@@ -55,6 +55,15 @@ docker exec -it mysql bash
 ```bash
 mysql -uroot -paluno problemlp2
 ```
+
+# Swagger UI
+
+Acesse a documentação do projeto através da interface do Swagger UI, que permite explorar os endpoints disponíveis, ver os parâmetros e as respostas de cada endpoint, bem como testar cada endpoint diretamente na interface.
+
+Link:
+http://localhost:8080/q/swagger-ui
+
+![SwaggerImage](https://github.com/BryanRibeiro/LP2-Project/assets/70216549/596fd9ee-d233-42a4-bdcd-2820e2e6359d)
 
 # Endpoints Disponíveis
 
